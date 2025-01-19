@@ -8,7 +8,7 @@ import { logger } from '../shared/logger.js';
 import { runDefaultAction } from './actions/defaultAction.js';
 import { runInitAction } from './actions/initAction.js';
 import { runRemoteAction } from './actions/remoteAction.js';
-import { runSearchAction } from './actions/searchAction.js';
+import { searchAction } from './actions/searchAction.js';
 import { runVersionAction } from './actions/versionAction.js';
 
 export interface CliOptions extends OptionValues {
@@ -100,7 +100,7 @@ export const executeAction = async (directory: string, cwd: string, options: Cli
   }
 
   if (options.search) {
-    await runSearchAction(options.search, options);
+    await searchAction(options.search, process.cwd(), options);
     return;
   }
 

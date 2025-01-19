@@ -50,6 +50,34 @@ export const repomixConfigBaseSchema = z.object({
     .optional(),
 });
 
+// Define the CliOptions interface
+export interface CliOptions {
+  version?: boolean;
+  output?: string;
+  include?: string;
+  ignore?: string;
+  config?: string;
+  copy?: boolean;
+  verbose?: boolean;
+  topFilesLen?: number;
+  outputShowLineNumbers?: boolean;
+  style?: RepomixOutputStyle;
+  init?: boolean;
+  global?: boolean;
+  remote?: string;
+  remoteBranch?: string;
+  securityCheck?: boolean;
+  fileSummary?: boolean;
+  directoryStructure?: boolean;
+  removeComments?: boolean;
+  removeEmptyLines?: boolean;
+  tokenCountEncoding?: string;
+  search?: string;
+  forceUpdateVector?: boolean;
+  vectorStorePath?: string;
+  openaiApiKey?: string;
+}
+
 // Default config schema with default values
 export const repomixConfigDefaultSchema = z.object({
   output: z

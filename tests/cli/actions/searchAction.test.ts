@@ -1,5 +1,6 @@
 import * as fs from 'node:fs/promises';
 import path from 'node:path';
+import { globby } from 'globby';
 import ora from 'ora';
 import { describe, expect, it, vi } from 'vitest';
 import { searchAction } from '../../../src/cli/actions/searchAction.js';
@@ -15,12 +16,6 @@ vi.mock('ora', () => {
       succeed: vi.fn().mockReturnThis(),
       fail: vi.fn().mockReturnThis(),
     })),
-  };
-});
-
-vi.mock('globby', async () => {
-  return {
-    default: vi.fn(),
   };
 });
 
@@ -80,13 +75,10 @@ describe('Search Action', () => {
   it('should load configuration and filter files', async () => {
     const mockFiles = ['/path/to/project/src/file1.ts', '/path/to/project/src/file2.ts'];
 
-    // Import globby
-    const globby = await import('globby');
-
     // Mock the dependencies
     (loadFileConfig as ReturnType<typeof vi.fn>).mockResolvedValue({});
     (mergeConfigs as ReturnType<typeof vi.fn>).mockReturnValue(mockConfig);
-    (globby.default as ReturnType<typeof vi.fn>).mockResolvedValue(mockFiles);
+    (globby as ReturnType<typeof vi.fn>).mockResolvedValue(mockFiles);
     (path.resolve as ReturnType<typeof vi.fn>).mockReturnValue('/path/to/project');
     (fs.readFile as ReturnType<typeof vi.fn>).mockResolvedValue('file content');
 
@@ -103,15 +95,14 @@ describe('Search Action', () => {
 
     expect(loadFileConfig).toHaveBeenCalledWith('/path/to/cwd', mockOptions.config);
     expect(mergeConfigs).toHaveBeenCalledWith('/path/to/cwd', {}, mockOptions);
-    expect(globby.default).toHaveBeenCalledWith(['/path/to/project/src/*'], { ignore: ['/path/to/project/tests/*'] });
+    expect(globby as ReturnType<typeof vi.fn>).toHaveBeenCalledWith(['/path/to/project/src/*'], {
+      ignore: ['/path/to/project/tests/*'],
+    });
     expect(createVector).toHaveBeenCalledTimes(mockFiles.length);
   });
 
   it('should handle errors during search action', async () => {
     const mockError = new Error('Search action failed');
-
-    // Import globby
-    const globby = await import('globby');
 
     // Mock the dependencies to simulate an error
     (loadFileConfig as ReturnType<typeof vi.fn>).mockRejectedValue(mockError);

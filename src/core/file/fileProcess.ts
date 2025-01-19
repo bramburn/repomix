@@ -8,6 +8,19 @@ import type { RepomixProgressCallback } from '../../shared/types.js';
 import { getFileManipulator } from './fileManipulate.js';
 import type { ProcessedFile, RawFile } from './fileTypes.js';
 
+export type CreateVectorFunction = (content: string, filePath: string) => Promise<void>;
+
+export const createVector: CreateVectorFunction = async (content: string, filePath: string): Promise<void> => {
+  try {
+    logger.debug(`Creating vector for file: ${filePath}`);
+    // TODO: Implement vector creation logic
+    await Promise.resolve();
+  } catch (error) {
+    logger.error(`Error creating vector for file ${filePath}:`, error);
+    throw error;
+  }
+};
+
 export const processFiles = async (
   rawFiles: RawFile[],
   config: RepomixConfigMerged,

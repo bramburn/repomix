@@ -1,12 +1,39 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import globby from 'globby';
+import { globby } from 'globby';
 import ora from 'ora';
 import { loadFileConfig, mergeConfigs } from '../../config/configLoad.js';
 import type { CliOptions, RepomixConfigMerged } from '../../config/configSchema.js';
 import type { CreateVectorFunction } from '../../core/file/fileProcess.js';
 import { createVector } from '../../core/file/fileProcess.js';
 import { logger } from '../../shared/logger.js';
+
+const transformCliOptions = (options: CliOptions) => {
+  return {
+    ...options,
+    output: options.output
+      ? {
+          filePath: options.output,
+          style: options.style,
+          showLineNumbers: options.outputShowLineNumbers,
+          fileSummary: options.fileSummary,
+          directoryStructure: options.directoryStructure,
+          removeComments: options.removeComments,
+          removeEmptyLines: options.removeEmptyLines,
+          copyToClipboard: options.copy,
+        }
+      : undefined,
+    include: options.include ? [options.include] : undefined,
+    ignore: options.ignore
+      ? {
+          customPatterns: [options.ignore],
+          useGitignore: true,
+          useDefaultPatterns: true,
+        }
+      : undefined,
+    security: options.securityCheck ? { enableSecurityCheck: options.securityCheck } : undefined,
+  };
+};
 
 const loadAndParseOptions = async (
   directory: string,
@@ -17,7 +44,8 @@ const loadAndParseOptions = async (
 }> => {
   try {
     const fileConfig = await loadFileConfig(cwd, options.config ?? null);
-    const config = mergeConfigs(cwd, fileConfig, options);
+    const transformedOptions = transformCliOptions(options);
+    const config = mergeConfigs(cwd, fileConfig, transformedOptions);
     return { config };
   } catch (error) {
     logger.error('Error loading and parsing options:', error);
