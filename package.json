@@ -27,6 +27,7 @@
     "lint-secretlint": "secretlint \"**/*\" --secretlintignore .gitignore",
     "test": "vitest",
     "test-coverage": "vitest run --coverage",
+    "test-vector-search": "vitest run tests/cli/actions/searchAction.test.ts tests/core/metadata/metadataManager.test.ts",
     "cli-run": "npm run build && node --trace-warnings bin/repomix.cjs",
     "npm-publish": "npm run lint && npm run test-coverage && npm run build && npm publish",
     "npm-release-patch": "npm version patch && npm run npm-publish",
@@ -61,11 +62,15 @@
   "type": "module",
   "dependencies": {
     "@clack/prompts": "^0.9.1",
+    "@langchain/community": "^0.3.25",
+    "@langchain/core": "^0.3.31",
+    "@langchain/openai": "^0.3.17",
     "@secretlint/core": "^9.0.0",
     "@secretlint/secretlint-rule-preset-recommend": "^9.0.0",
     "cli-spinners": "^2.9.2",
     "clipboardy": "^4.0.0",
     "commander": "^13.0.0",
+    "faiss-node": "^0.5.1",
     "globby": "^14.0.2",
     "handlebars": "^4.7.8",
     "iconv-lite": "^0.6.3",
@@ -73,6 +78,7 @@
     "jschardet": "^3.1.4",
     "log-update": "^6.1.0",
     "minimatch": "^10.0.1",
+    "openai": "^4.79.1",
     "p-map": "^7.0.3",
     "picocolors": "^1.1.1",
     "strip-comments": "^2.0.1",
@@ -82,13 +88,13 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
-    "@types/node": "^22.10.5",
+    "@types/node": "^20.11.5",
     "@types/strip-comments": "^2.0.4",
-    "@vitest/coverage-v8": "^2.1.8",
+    "@vitest/coverage-v8": "^1.2.0",
     "rimraf": "^6.0.1",
     "secretlint": "^9.0.0",
     "typescript": "^5.7.3",
-    "vitest": "^2.1.8"
+    "vitest": "^1.2.0"
   },
   "engines": {
     "node": ">=18.0.0",

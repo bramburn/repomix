@@ -8,6 +8,7 @@ import { logger } from '../shared/logger.js';
 import { runDefaultAction } from './actions/defaultAction.js';
 import { runInitAction } from './actions/initAction.js';
 import { runRemoteAction } from './actions/remoteAction.js';
+import { runSearchAction } from './actions/searchAction.js';
 import { runVersionAction } from './actions/versionAction.js';
 
 export interface CliOptions extends OptionValues {
@@ -31,6 +32,8 @@ export interface CliOptions extends OptionValues {
   removeComments?: boolean;
   removeEmptyLines?: boolean;
   tokenCountEncoding?: string;
+  search?: string;
+  forceUpdateVector?: boolean;
 }
 
 export const run = async () => {
@@ -61,6 +64,8 @@ export const run = async () => {
         'specify the remote branch name, tag, or commit hash (defaults to repository default branch)',
       )
       .option('--no-security-check', 'disable security check')
+      .option('--search <query>', 'perform vector search on the repository')
+      .option('--force-update-vector', 'force update of the vector database from scratch')
       .action((directory = '.', options: CliOptions = {}) => executeAction(directory, process.cwd(), options));
 
     await program.parseAsync(process.argv);
@@ -87,6 +92,11 @@ export const executeAction = async (directory: string, cwd: string, options: Cli
 
   if (options.remote) {
     await runRemoteAction(options.remote, options);
+    return;
+  }
+
+  if (options.search) {
+    await runSearchAction(options.search, options);
     return;
   }
 

@@ -48,7 +48,41 @@ It is perfect for when you need to feed your codebase to Large Language Models (
 - **Git-Aware**: Automatically respects your .gitignore files.
 - **Security-Focused**: Incorporates [Secretlint](https://github.com/secretlint/secretlint) for robust security checks to detect and prevent inclusion of sensitive information.
 
+## Advanced Search Capabilities
 
+### Vector Search
+
+Repomix now supports advanced vector search capabilities using OpenAI embeddings and FAISS vector database.
+
+#### Usage
+
+```bash
+# Perform a vector search across your repository
+repomix --search "find files related to authentication"
+
+# Force update the vector database from scratch
+repomix --search "authentication" --force-update-vector
+```
+
+#### Prerequisites
+
+- Set your OpenAI API key as an environment variable:
+  ```bash
+  export OPENAI_API_KEY=your_openai_api_key
+  ```
+
+#### How It Works
+
+- The tool creates a local FAISS vector database to store file embeddings
+- Only files that have changed will be re-embedded
+- Search results are ranked by semantic similarity
+- Vector database is persisted between searches for efficiency
+
+#### Notes
+
+- Requires an OpenAI API key for generating embeddings
+- Initial indexing may take some time depending on repository size
+- Search results include file paths and relevant code snippets
 
 ## 🚀 Quick Start
 ### Using the CLI Tool `>_`
