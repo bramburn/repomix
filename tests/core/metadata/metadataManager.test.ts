@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { loadFileMetadata, saveFileMetadata } from '../../../src/core/metadata/metadataManager';
@@ -65,5 +65,30 @@ describe('Metadata Manager', () => {
     const loadedMetadata = await loadFileMetadata(deepPath);
     
     expect(loadedMetadata).toEqual(testMetadata);
+  });
+
+  it('should handle large metadata files', async () => {
+    const largeTestMetadata: Record<string, { hash: string, timestamp: number }> = {};
+    for (let i = 0; i < 1000; i++) {
+      largeTestMetadata[`/path/to/file${i}.txt`] = { 
+        hash: `hash${i}`, 
+        timestamp: Date.now() + i 
+      };
+    }
+
+    await saveFileMetadata(testMetadataPath, largeTestMetadata);
+
+    const loadedMetadata = await loadFileMetadata(testMetadataPath);
+    
+    expect(Object.keys(loadedMetadata).length).toBe(1000);
+  });
+
+  it('should gracefully handle invalid JSON during loading', async () => {
+    // Write invalid JSON to the file
+    await fs.writeFile(testMetadataPath, '{invalid json}');
+
+    const metadata = await loadFileMetadata(testMetadataPath);
+    
+    expect(metadata).toEqual({});
   });
 });

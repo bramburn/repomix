@@ -54,11 +54,37 @@ It is perfect for when you need to feed your codebase to Large Language Models (
 
 Repomix now supports advanced vector search capabilities using OpenAI embeddings and FAISS vector database.
 
+#### Key Features
+- Semantic search across your entire repository
+- Utilizes OpenAI embeddings for intelligent matching
+- Persistent vector database for efficient searching
+- Flexible configuration options
+- Supports custom vector store paths
+- Secure API key management
+
+#### How It Works
+- Creates a local FAISS vector database to store file embeddings
+- Uses semantic similarity to rank search results
+- Only re-embeds files that have changed
+- Persists vector database between searches for performance
+- Provides detailed search results with file paths and code snippets
+
+#### Customization Options
+- `--vector-store-path`: Specify a custom location for the vector store
+- `--openai-api-key`: Provide your OpenAI API key via CLI
+- `--force-update-vector`: Force a complete re-indexing of your repository
+
 #### Usage
 
 ```bash
 # Perform a vector search across your repository
 repomix --search "find files related to authentication"
+
+# Specify a custom vector store path
+repomix --search "authentication" --vector-store-path /path/to/custom/vector/store
+
+# Provide OpenAI API key via CLI
+repomix --search "authentication" --openai-api-key sk-your_openai_api_key
 
 # Force update the vector database from scratch
 repomix --search "authentication" --force-update-vector
@@ -66,12 +92,13 @@ repomix --search "authentication" --force-update-vector
 
 #### Prerequisites
 
-- Set your OpenAI API key as an environment variable:
-  ```bash
-  export OPENAI_API_KEY=your_openai_api_key
-  ```
-
-#### How It Works
+- OpenAI API Key: You can provide the key in three ways:
+  1. Set as an environment variable:
+     ```bash
+     export OPENAI_API_KEY=your_openai_api_key
+     ```
+  2. Use the `--openai-api-key` CLI argument
+  3. Configure in your `repomix.config.json`
 
 - The tool creates a local FAISS vector database to store file embeddings
 - Only files that have changed will be re-embedded

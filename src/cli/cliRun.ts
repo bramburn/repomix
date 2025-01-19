@@ -34,6 +34,8 @@ export interface CliOptions extends OptionValues {
   tokenCountEncoding?: string;
   search?: string;
   forceUpdateVector?: boolean;
+  vectorStorePath?: string;
+  openaiApiKey?: string;
 }
 
 export const run = async () => {
@@ -66,6 +68,8 @@ export const run = async () => {
       .option('--no-security-check', 'disable security check')
       .option('--search <query>', 'perform vector search on the repository')
       .option('--force-update-vector', 'force update of the vector database from scratch')
+      .option('--vector-store-path <path>', 'specify the path to the FAISS vector store')
+      .option('--openai-api-key <key>', 'specify the OpenAI API key')
       .action((directory = '.', options: CliOptions = {}) => executeAction(directory, process.cwd(), options));
 
     await program.parseAsync(process.argv);

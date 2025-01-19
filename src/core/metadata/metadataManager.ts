@@ -7,13 +7,19 @@ export async function loadFileMetadata(
 ): Promise<{ [filePath: string]: { hash: string, timestamp: number } }> {
   try {
     const metadataContent = await fs.readFile(metadataPath, 'utf8');
-    return JSON.parse(metadataContent) as { [filePath: string]: { hash: string, timestamp: number } };
+    try {
+      return JSON.parse(metadataContent) as { [filePath: string]: { hash: string, timestamp: number } };
+    } catch (parseError) {
+      // Log the parsing error but return an empty object
+      logger.warn(`Invalid JSON in metadata file ${metadataPath}: ${parseError}`);
+      return {};
+    }
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
       return {};
     }
     logger.error('Error loading metadata:', error);
-    throw error;
+    return {}; // Return empty object for any other unexpected errors
   }
 }
 

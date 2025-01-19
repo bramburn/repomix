@@ -1,0 +1,6 @@
+{
+  "/path/to/file.txt": {
+    "hash": "abc123",
+    "timestamp": 1234567890
+  }
+}

@@ -8,6 +8,8 @@ import crypto from 'node:crypto';
 import { loadFileMetadata, saveFileMetadata } from '../../core/metadata/metadataManager.js';
 import type { CliOptions } from '../cliRun.js';
 import { logger } from '../../shared/logger.js';
+import { access } from 'node:fs/promises';
+import { constants } from 'node:fs';
 
 interface FileMetadata {
   [filePath: string]: { hash: string, timestamp: number };
@@ -52,19 +54,55 @@ async function updateVectorDB(
   }
 }
 
+// Validate the vector store path to ensure the directory is writable
+// This prevents issues with saving or loading the vector store
+async function validateVectorStorePath(vectorIndexPath: string): Promise<boolean> {
+  try {
+    // Check if the parent directory of the vector store is writable
+    await access(path.dirname(vectorIndexPath), constants.W_OK);
+    return true;
+  } catch {
+    // Return false if the directory is not writable
+    return false;
+  }
+}
+
+// Validate the OpenAI API key to ensure it meets basic requirements
+// Prevents unnecessary API calls with invalid keys
+function validateOpenAIApiKey(apiKey: string): boolean {
+  // Basic validation:
+  // 1. Check if the key is not empty
+  // 2. Ensure the key has a reasonable minimum length (most API keys are longer)
+  return apiKey && apiKey.trim().length > 20;
+}
+
 export const runSearchAction = async (
   searchQuery: string,
   options: CliOptions
 ): Promise<void> => {
-  const openAIApiKey = process.env.OPENAI_API_KEY;
+  const openAIApiKey = options.openaiApiKey || process.env.OPENAI_API_KEY;
   if (!openAIApiKey) {
-    logger.error('OpenAI API key is required. Set OPENAI_API_KEY environment variable.');
+    logger.error('❌ OpenAI API key is required. Set OPENAI_API_KEY environment variable or use --openai-api-key argument.');
     return;
   }
 
-  const directory = process.cwd();
-  const metadataPath = path.join(directory, 'repomix-metadata.json');
-  const vectorIndexPath = path.join(directory, 'repomix-vector.faiss');
+  if (!validateOpenAIApiKey(openAIApiKey)) {
+    logger.error('❌ Invalid OpenAI API key. Please provide a valid API key.');
+    return;
+  }
+
+  const vectorIndexPath = options.vectorStorePath || path.join(process.cwd(), 'repomix-vector.faiss');
+  
+  // Validate vector store path
+  if (options.vectorStorePath) {
+    const isValidPath = await validateVectorStorePath(vectorIndexPath);
+    if (!isValidPath) {
+      logger.error(`❌ Invalid vector store path: ${vectorIndexPath}. Ensure the directory is writable.`);
+      return;
+    }
+  }
+
+  const metadataPath = path.join(process.cwd(), 'repomix-metadata.json');
 
   // Initialize OpenAI embeddings
   const embeddings = new OpenAIEmbeddings({ openAIApiKey });
@@ -86,10 +124,10 @@ export const runSearchAction = async (
     fileMetadata = {};
   }
 
-  const listOfFiles = await fs.readdir(directory);
+  const listOfFiles = await fs.readdir(process.cwd());
 
   for (const fileName of listOfFiles) {
-    const filePath = path.join(directory, fileName);
+    const filePath = path.join(process.cwd(), fileName);
     const fileStat = await fs.stat(filePath);
 
     if (fileStat.isFile()) {

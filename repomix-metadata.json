@@ -1,0 +1,106 @@
+{
+  "C:\\dev\\repomix\\.codecov.yml": {
+    "hash": "c10f0f9d074bb88b4eb11f06ba62530ca2399b439b4430afb6e3bc5477bb4592",
+    "timestamp": 1737289517673.734
+  },
+  "C:\\dev\\repomix\\.dockerignore": {
+    "hash": "3c871df7033c05054b0c562151f768037953b89881e271206a4e2daff6f9ab5d",
+    "timestamp": 1737289517675.745
+  },
+  "C:\\dev\\repomix\\.editorconfig": {
+    "hash": "3501bf6e76eb7f555a1240fc0c2e6b45220eda9da3cf8e27f9225f1f5d8066d6",
+    "timestamp": 1737289517675.745
+  },
+  "C:\\dev\\repomix\\.gitignore": {
+    "hash": "a3cffccb8eadf21e78814950a64a7a9f3b3255666d00dbfa7619ad9d579e78e8",
+    "timestamp": 1737289517680.98
+  },
+  "C:\\dev\\repomix\\.node-version": {
+    "hash": "721ff8ca0c7f6aca13c5a23af6681431c0c44c4a63e0bca406a097a631fd4a82",
+    "timestamp": 1737289517681.486
+  },
+  "C:\\dev\\repomix\\.npmignore": {
+    "hash": "8c87ad6a86accc64a8b424931dc2e0243c25ac6c253c86643333bd05181e66a2",
+    "timestamp": 1737289517681.486
+  },
+  "C:\\dev\\repomix\\.repomixignore": {
+    "hash": "312eb80b69a198dbce485c31515ccb7114ffee7782b49969d35c87a842161491",
+    "timestamp": 1737289517681.486
+  },
+  "C:\\dev\\repomix\\.secretlintrc.json": {
+    "hash": "7f0974a392ff6a11ad1410dcb7953f45f9413b06d117603b1ca47c623dfa7e5b",
+    "timestamp": 1737289517682.4934
+  },
+  "C:\\dev\\repomix\\.tool-versions": {
+    "hash": "ebe310544d207537a2be0c024e0a5de59dd1002a40883ca4f56321d385c71696",
+    "timestamp": 1737289517682.4934
+  },
+  "C:\\dev\\repomix\\biome.json": {
+    "hash": "33807521e625e6174585a7c57a6397b2442eaf29eb4824dc58cfc54628994310",
+    "timestamp": 1737289517686.5627
+  },
+  "C:\\dev\\repomix\\CODE_OF_CONDUCT.md": {
+    "hash": "49a7cc5081d43538ce834d1153f13edd72332ddc29f50db9e277f9d3356ed369",
+    "timestamp": 1737289517683.4934
+  },
+  "C:\\dev\\repomix\\CONTRIBUTING.md": {
+    "hash": "e163929ff3f9d423532944cfdcf7597a2addda1e52c3fc500303ba54ed6ed9ba",
+    "timestamp": 1737289517683.4934
+  },
+  "C:\\dev\\repomix\\Dockerfile": {
+    "hash": "80dd25f0a6b3292a169bd7aa6b9377d2dbebcc54f27d5a9ed197ce165b9cea24",
+    "timestamp": 1737289517683.4934
+  },
+  "C:\\dev\\repomix\\LICENSE": {
+    "hash": "67fd7fe1aa8c427d93f86d494f3ea3a686dcc4797402dd817b8b78a9711c90d7",
+    "timestamp": 1737289517684.496
+  },
+  "C:\\dev\\repomix\\package-lock.json": {
+    "hash": "52202e6ea868f2bf8d14714cc2689d24ff1faa81f9046b46ad093289ee7bd39d",
+    "timestamp": 1737289848725.8442
+  },
+  "C:\\dev\\repomix\\package.json": {
+    "hash": "4feb07c189f2d24d7b1c305c12950733d907ed13e95aedc10b55621072605314",
+    "timestamp": 1737291237523.368
+  },
+  "C:\\dev\\repomix\\README.md": {
+    "hash": "1076e58998549e375aecf2ed96ca7637f3ade86b73fc4a99381d403ec40d3bbc",
+    "timestamp": 1737289745492.1797
+  },
+  "C:\\dev\\repomix\\repomix-instruction.md": {
+    "hash": "415756dc2e65a1601b081a0ddf4fc2a8e7bfc9a9c0594a53cea61d279887a220",
+    "timestamp": 1737289517690.0784
+  },
+  "C:\\dev\\repomix\\repomix-metadata.json": {
+    "hash": "4dc9f8a063bd707bf2ce6906c43d7f5abdc26e953ed6f481520b60605b2d4a45",
+    "timestamp": 1737291247213.308
+  },
+  "C:\\dev\\repomix\\repomix-output.xml": {
+    "hash": "d762c80c9f6fb628741c638d118ab4b2b2289ebfdb5f83121db3e58b73915e35",
+    "timestamp": 1737290865139.3574
+  },
+  "C:\\dev\\repomix\\repomix.config.json": {
+    "hash": "dede26ce5b38c7e1e28466ab9b0c253da5c18e2121892a1acfcb6458b5c83971",
+    "timestamp": 1737289517690.0784
+  },
+  "C:\\dev\\repomix\\SECURITY.md": {
+    "hash": "ba5438ce1aa82a36c8c6a5a0d5832022d64c9a3b074be7738f626a669d6160eb",
+    "timestamp": 1737289517685.4941
+  },
+  "C:\\dev\\repomix\\tsconfig.build.json": {
+    "hash": "fdd64d96df99cf4cfe577bc23c7118724ccc26c03bb0d0c006c0b1c15d050fa8",
+    "timestamp": 1737289517743.6958
+  },
+  "C:\\dev\\repomix\\tsconfig.json": {
+    "hash": "b3c45431678ffbb5228fd2752a80ea5f5c8411fa8cd5f714f788ce48ff75a783",
+    "timestamp": 1737289517743.6958
+  },
+  "C:\\dev\\repomix\\typos.toml": {
+    "hash": "3fbaeaa93ba7007516e2a801d513b35606eb52c14f45690250bfbe3b2131091b",
+    "timestamp": 1737289517744.7
+  },
+  "C:\\dev\\repomix\\vitest.config.ts": {
+    "hash": "aba6cf3e9160f6d2db4116558ebd71aecd7b318b68199808a3d3270fda9c241b",
+    "timestamp": 1737289517744.7
+  }
+}
