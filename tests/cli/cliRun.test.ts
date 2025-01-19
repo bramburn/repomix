@@ -22,6 +22,17 @@ vi.mock('../../src/shared/logger', () => ({
   },
 }));
 
+vi.mock('ora', () => {
+  return {
+    default: vi.fn(() => ({
+      start: vi.fn().mockReturnThis(),
+      stop: vi.fn().mockReturnThis(),
+      succeed: vi.fn().mockReturnThis(),
+      fail: vi.fn().mockReturnThis(),
+    })),
+  };
+});
+
 vi.mock('commander', () => ({
   program: {
     description: vi.fn().mockReturnThis(),

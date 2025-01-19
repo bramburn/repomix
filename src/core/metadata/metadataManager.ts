@@ -3,12 +3,12 @@ import path from 'node:path';
 import { logger } from '../../shared/logger.js';
 
 export async function loadFileMetadata(
-  metadataPath: string
-): Promise<{ [filePath: string]: { hash: string, timestamp: number } }> {
+  metadataPath: string,
+): Promise<{ [filePath: string]: { hash: string; timestamp: number } }> {
   try {
     const metadataContent = await fs.readFile(metadataPath, 'utf8');
     try {
-      return JSON.parse(metadataContent) as { [filePath: string]: { hash: string, timestamp: number } };
+      return JSON.parse(metadataContent) as { [filePath: string]: { hash: string; timestamp: number } };
     } catch (parseError) {
       // Log the parsing error but return an empty object
       logger.warn(`Invalid JSON in metadata file ${metadataPath}: ${parseError}`);
@@ -24,8 +24,8 @@ export async function loadFileMetadata(
 }
 
 export async function saveFileMetadata(
-  metadataPath: string, 
-  fileMetadata: { [filePath: string]: { hash: string, timestamp: number } }
+  metadataPath: string,
+  fileMetadata: { [filePath: string]: { hash: string; timestamp: number } },
 ): Promise<void> {
   try {
     await fs.mkdir(path.dirname(metadataPath), { recursive: true });

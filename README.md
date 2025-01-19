@@ -111,6 +111,26 @@ repomix --search "authentication" --force-update-vector
 - Initial indexing may take some time depending on repository size
 - Search results include file paths and relevant code snippets
 
+## Search Functionality
+
+Repomix provides a powerful search functionality that allows you to search through your repository's files using advanced filtering and vector-based search.
+
+### Search Options
+
+- `--include`: Specify file patterns to include in the search
+- `--ignore`: Specify file patterns to exclude from the search
+
+### Example Usage
+
+```bash
+repomix search /path/to/repo --include "*.ts" --ignore "tests/*"
+```
+
+#### Features
+- Supports glob patterns for file inclusion and exclusion
+- Creates vector representations of files for advanced search
+- Configurable search scope
+
 ## 🚀 Quick Start
 ### Using the CLI Tool `>_`
 You can try Repomix instantly in your project directory without installation:

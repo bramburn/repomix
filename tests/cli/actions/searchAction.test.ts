@@ -1,156 +1,139 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import * as fs from 'node:fs/promises';
 import path from 'node:path';
-import { constants } from 'node:fs';
-import { FaissStore } from "@langchain/community/vectorstores/faiss";
-import { OpenAIEmbeddings } from "@langchain/openai";
-import { runSearchAction } from '../../../src/cli/actions/searchAction';
-import { logger } from '../../../src/shared/logger';
+import ora from 'ora';
+import { describe, expect, it, vi } from 'vitest';
+import { searchAction } from '../../../src/cli/actions/searchAction.js';
+import { loadFileConfig, mergeConfigs } from '../../../src/config/configLoad.js';
+import { createVector } from '../../../src/core/file/fileProcess.js';
 
 // Mock dependencies
-vi.mock('@langchain/community/vectorstores/faiss');
-vi.mock('@langchain/openai');
-vi.mock('node:fs/promises');
-vi.mock('../../../src/shared/logger');
+vi.mock('ora', () => {
+  return {
+    default: vi.fn(() => ({
+      start: vi.fn().mockReturnThis(),
+      stop: vi.fn().mockReturnThis(),
+      succeed: vi.fn().mockReturnThis(),
+      fail: vi.fn().mockReturnThis(),
+    })),
+  };
+});
+
+vi.mock('globby', async () => {
+  return {
+    default: vi.fn(),
+  };
+});
+
+vi.mock('../../../src/config/configLoad.js', () => ({
+  loadFileConfig: vi.fn(),
+  mergeConfigs: vi.fn(),
+}));
+
+vi.mock('../../../src/core/file/fileProcess.js', () => ({
+  createVector: vi.fn(),
+}));
+
+// Mock path module
+vi.mock('node:path', async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    resolve: vi.fn((p) => p),
+    join: vi.fn((...args) => args.join('/')),
+    default: {
+      resolve: vi.fn((p) => p),
+      join: vi.fn((...args) => args.join('/')),
+    },
+  };
+});
+
+// Mock fs module
+vi.mock('node:fs/promises', () => ({
+  readFile: vi.fn(),
+}));
 
 describe('Search Action', () => {
-  const testTempDir = path.join(process.cwd(), 'tests', 'temp');
-  const testVectorPath = path.join(testTempDir, 'test-vector.faiss');
-  const testMetadataPath = path.join(testTempDir, 'test-metadata.json');
+  // Define mockConfig and mockOptions at the top level of the describe block
+  const mockConfig = {
+    include: ['src/*'],
+    ignore: {
+      useGitignore: true,
+      useDefaultPatterns: true,
+      customPatterns: ['tests/*'],
+    },
+    output: {
+      filePath: 'repomix-output.txt',
+      style: 'plain',
+      fileSummary: true,
+      directoryStructure: true,
+    },
+  };
+
+  const mockOptions = {
+    config: 'path/to/config',
+  };
 
   beforeEach(() => {
-    // Reset mocks
-    vi.resetAllMocks();
-
-    // Mock OpenAI API key
-    process.env.OPENAI_API_KEY = 'test-api-key-with-sufficient-length';
-
-    // Mock file system methods
-    vi.mocked(fs.readdir).mockResolvedValue(['file1.txt', 'file2.txt'] as any);
-    vi.mocked(fs.stat).mockResolvedValue({ 
-      isFile: () => true, 
-      mtimeMs: Date.now() 
-    } as any);
-    vi.mocked(fs.readFile).mockResolvedValue('Sample file content');
-    
-    // Mock access method for vector store path validation
-    vi.mocked(fs.access).mockResolvedValue(undefined);
-
-    // Mock FaissStore methods
-    vi.mocked(FaissStore.load).mockRejectedValue(new Error('No existing store'));
-    vi.mocked(FaissStore.fromTexts).mockResolvedValue({
-      addDocuments: vi.fn(),
-      delete: vi.fn(),
-      save: vi.fn(),
-      similaritySearch: vi.fn().mockResolvedValue([
-        { 
-          pageContent: 'Test file content', 
-          metadata: { source: '/test/file1.txt' } 
-        }
-      ])
-    });
+    vi.clearAllMocks();
   });
 
-  afterEach(() => {
-    // Clear environment
-    delete process.env.OPENAI_API_KEY;
-  });
+  it('should load configuration and filter files', async () => {
+    const mockFiles = ['/path/to/project/src/file1.ts', '/path/to/project/src/file2.ts'];
 
-  it('should perform vector search with valid OpenAI API key', async () => {
-    const mockOptions = { 
-      search: 'test query',
-      openaiApiKey: 'test-api-key-with-sufficient-length'
+    // Import globby
+    const globby = await import('globby');
+
+    // Mock the dependencies
+    (loadFileConfig as ReturnType<typeof vi.fn>).mockResolvedValue({});
+    (mergeConfigs as ReturnType<typeof vi.fn>).mockReturnValue(mockConfig);
+    (globby.default as ReturnType<typeof vi.fn>).mockResolvedValue(mockFiles);
+    (path.resolve as ReturnType<typeof vi.fn>).mockReturnValue('/path/to/project');
+    (fs.readFile as ReturnType<typeof vi.fn>).mockResolvedValue('file content');
+
+    const mockDeps = {
+      loadFileConfig,
+      mergeConfigs,
+      fileGlob: globby.default,
+      createVector,
+      fileRead: fs.readFile,
+      spinner: ora,
     };
 
-    await runSearchAction('test query', mockOptions);
+    await searchAction('/path/to/project', '/path/to/cwd', mockOptions, mockDeps);
 
-    // Verify key interactions
-    expect(FaissStore.load).toHaveBeenCalled();
-    expect(FaissStore.fromTexts).toHaveBeenCalled();
-    expect(logger.log).toHaveBeenCalled();
+    expect(loadFileConfig).toHaveBeenCalledWith('/path/to/cwd', mockOptions.config);
+    expect(mergeConfigs).toHaveBeenCalledWith('/path/to/cwd', {}, mockOptions);
+    expect(globby.default).toHaveBeenCalledWith(['/path/to/project/src/*'], { ignore: ['/path/to/project/tests/*'] });
+    expect(createVector).toHaveBeenCalledTimes(mockFiles.length);
   });
 
-  it('should throw error for short or invalid OpenAI API key', async () => {
-    const mockOptions = { 
-      search: 'test query',
-      openaiApiKey: 'short' 
+  it('should handle errors during search action', async () => {
+    const mockError = new Error('Search action failed');
+
+    // Import globby
+    const globby = await import('globby');
+
+    // Mock the dependencies to simulate an error
+    (loadFileConfig as ReturnType<typeof vi.fn>).mockRejectedValue(mockError);
+    (mergeConfigs as ReturnType<typeof vi.fn>).mockReturnValue(mockConfig);
+
+    const mockDeps = {
+      loadFileConfig,
+      mergeConfigs,
+      fileGlob: globby.default,
+      createVector,
+      fileRead: fs.readFile,
+      spinner: ora,
     };
 
-    await runSearchAction('test query', mockOptions);
+    // Suppress console error to keep test output clean
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-    // Verify error logging for invalid API key
-    expect(logger.error).toHaveBeenCalledWith(
-      expect.stringContaining('Invalid OpenAI API key')
+    await expect(searchAction('/path/to/project', '/path/to/cwd', mockOptions, mockDeps)).rejects.toThrow(
+      'Search action failed',
     );
-  });
 
-  it('should validate vector store path', async () => {
-    const mockOptions = { 
-      search: 'test query',
-      vectorStorePath: testVectorPath
-    };
-
-    // Mock access to fail for vector store path
-    vi.mocked(fs.access).mockRejectedValue(new Error('Path not writable'));
-
-    await runSearchAction('test query', mockOptions);
-
-    // Verify error logging for invalid vector store path
-    expect(logger.error).toHaveBeenCalledWith(
-      expect.stringContaining('Invalid vector store path')
-    );
-  });
-
-  it('should handle force vector update', async () => {
-    const mockOptions = { 
-      search: 'test query', 
-      forceUpdateVector: true,
-      openaiApiKey: 'test-api-key-with-sufficient-length'
-    };
-
-    await runSearchAction('test query', mockOptions);
-
-    // Verify force update behavior
-    expect(logger.log).toHaveBeenCalledWith(expect.stringContaining('Forcing vector update'));
-  });
-
-  it('should throw error if no OpenAI API key is provided', async () => {
-    delete process.env.OPENAI_API_KEY;
-
-    const mockOptions = { search: 'test query' };
-
-    await runSearchAction('test query', mockOptions);
-
-    // Verify error logging
-    expect(logger.error).toHaveBeenCalledWith(
-      expect.stringContaining('OpenAI API key is required')
-    );
-  });
-
-  it('should perform similarity search and log results', async () => {
-    const mockOptions = { 
-      search: 'test query',
-      openaiApiKey: 'test-api-key-with-sufficient-length'
-    };
-
-    // Adjust mock to return a method that can be called
-    vi.mocked(FaissStore.fromTexts).mockResolvedValue({
-      addDocuments: vi.fn(),
-      delete: vi.fn(),
-      save: vi.fn(),
-      similaritySearch: vi.fn().mockResolvedValue([
-        { 
-          pageContent: 'Test file content', 
-          metadata: { source: '/test/file1.txt' } 
-        }
-      ])
-    });
-
-    await runSearchAction('test query', mockOptions);
-
-    // Verify search and logging
-    const mockVectorStore = await FaissStore.fromTexts([], [], {} as any);
-    expect(mockVectorStore.similaritySearch).toHaveBeenCalledWith('test query', 5);
-    expect(logger.log).toHaveBeenCalledWith(expect.stringContaining('Vector Search Results'));
+    // Restore console.error
+    consoleErrorSpy.mockRestore();
   });
 });
